@@ -12,9 +12,8 @@ export class AuthController{
     //     console.log(req);
 
     @Post("signup")
-    signup(@Body() body:AuthDto){
-        console.log(body);
-        return this.authService.signup()
+    signup(@Body() dto:AuthDto){
+        return this.authService.signup(dto)
     }
 
     @Post("signin")
