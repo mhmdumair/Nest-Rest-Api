@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
+import { User } from '../user/user.schema'; 
 
 @Schema({ timestamps: true })
 export class Bookmark extends Document {
@@ -12,8 +13,11 @@ export class Bookmark extends Document {
   @Prop({ required: true })
   link: string;
 
+  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+  userId: Types.ObjectId;
+
   createdAt?: Date;
-  updatedAt?: Date; 
+  updatedAt?: Date;
 }
 
 export const BookmarkSchema = SchemaFactory.createForClass(Bookmark);
