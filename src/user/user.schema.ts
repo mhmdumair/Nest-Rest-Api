@@ -11,14 +11,10 @@ export class User extends Document {
   password: string;
 
   @Prop()
-  firstName?: string;
+  name: string;
 
-  @Prop()
-  lastName?: string;
 
-  async comparePassword(candidatePassword: string): Promise<boolean> {
-    return bcrypt.compare(candidatePassword, this.password);
-  }
+  comparePassword: (candidatePassword: string) => Promise<boolean>;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
@@ -34,3 +30,7 @@ UserSchema.pre<User>('save', async function (next) {
     next(error);
   }
 });
+
+UserSchema.methods.comparePassword = async function (candidatePassword: string): Promise<boolean> {
+  return bcrypt.compare(candidatePassword, this.password);
+};

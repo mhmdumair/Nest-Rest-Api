@@ -1,5 +1,5 @@
 import { ConflictException, Injectable } from "@nestjs/common";
-import { AuthDto } from "./dto";
+import { SignInDto, SignUpDto } from "./dto";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { User } from "src/user/user.schema";
@@ -11,8 +11,8 @@ export class AuthService{
         @InjectModel(User.name) private userModel: Model<User>
     ) {}
 
-    async signup(dto: AuthDto) {
-        const { email, password } = dto;
+    async signup(dto: SignUpDto) {
+        const { email, password,name } = dto;
     
         const existingUser = await this.userModel.findOne({ email });
         if (existingUser) {
@@ -21,7 +21,8 @@ export class AuthService{
     
         const newUser = new this.userModel({
           email,
-          password: password, 
+          password: password,
+          name 
         });
     
         return newUser.save(); 
@@ -29,8 +30,17 @@ export class AuthService{
     
     
 
-    signin(){
-        return "I am sign in"
+    async signin(dto:SignInDto){
+        const {email,password} = dto;
+        const user = await this.userModel.findOne({email}).select('+password');
+        if(!user){
+            throw new ConflictException("User not found")
+        }
+        const isMatch = await user.comparePassword(password);
+        if (!isMatch) {
+          throw new ConflictException('Invalid password');
+        }
+        return user;
     }
 
 }
