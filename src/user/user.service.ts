@@ -13,6 +13,7 @@ export class UserService {
   }
 
   async getUser(email: string) {
-    return this.userModel.findOne({ email }).select('+password');
+    const user = await this.userModel.findOne({ email });
+    return user ? user : null;
   }
 }

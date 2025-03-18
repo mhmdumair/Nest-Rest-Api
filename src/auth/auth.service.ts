@@ -6,6 +6,12 @@ import { User } from '../user/user.schema'; // Ensure this import is correct
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { SignInDto, SignUpDto } from './dto';
+import { UserService } from 'src/user/user.service';
+
+interface Payload {
+  _id: string;
+  email: string;
+}
 
 @Injectable()
 export class AuthService {
@@ -13,6 +19,7 @@ export class AuthService {
     @InjectModel(User.name) private userModel: Model<User>,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private userService: UserService,
   ) {}
 
   async signup(dto: SignUpDto) {
@@ -59,7 +66,11 @@ export class AuthService {
     const payload = { id, email };
     return this.jwtService.signAsync(payload, {
       expiresIn: '15m',
-      secret: this.configService.get<string>('JWT_SECRET'),
+      secret: this.configService.get<string>('JWT_SECRET', 'default_secret'),
     });
+  }
+
+  async validateUser(payload:Payload): Promise<any> {
+    return await this.userService.getUser(payload.email);
   }
 }
